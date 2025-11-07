@@ -248,7 +248,20 @@ DankModal {
         allScenes.clear()
         filteredScenes.clear()
 
-        sceneScanProcess.command = ["ls", "-1", steamWorkshopPath]
+        // Use bash script with jq to map sceneId => name
+        sceneScanProcess.command = ["bash", "-c",
+            `cd "${steamWorkshopPath}" && for dir in */; do
+                id="\${dir%/}"
+                if [[ "$id" =~ ^[0-9]+$ ]] && [[ -f "$id/project.json" ]]; then
+                    title=$(jq -r '.title // empty' "$id/project.json" 2>/dev/null)
+                    if [[ -n "$title" ]]; then
+                        echo "$id|$title"
+                    else
+                        echo "$id|$id"
+                    fi
+                fi
+            done`
+        ]
         sceneScanProcess.running = true
     }
 
@@ -266,13 +279,17 @@ DankModal {
             if (code === 0 && sceneOutput) {
                 const lines = sceneOutput.trim().split('\n')
                 for (const line of lines) {
-                    const sceneId = line.trim()
-                    if (sceneId && /^\d+$/.test(sceneId)) {
-                        const sceneName = readProjectJson(sceneId)
-                        allScenes.append({
-                            sceneId: sceneId,
-                            name: sceneName || sceneId
-                        })
+                    const trimmedLine = line.trim()
+                    if (trimmedLine) {
+                        const parts = trimmedLine.split('|')
+                        if (parts.length >= 2) {
+                            const sceneId = parts[0]
+                            const sceneName = parts.slice(1).join('|') // Handle names with | in them
+                            allScenes.append({
+                                sceneId: sceneId,
+                                name: sceneName
+                            })
+                        }
                     }
                 }
                 filterScenes()
@@ -282,6 +299,7 @@ DankModal {
     }
 
     function readProjectJson(sceneId) {
+        // This function is no longer needed as names are fetched during scan
         return sceneId
     }
 
