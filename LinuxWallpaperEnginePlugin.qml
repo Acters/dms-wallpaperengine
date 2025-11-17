@@ -182,7 +182,7 @@ PluginComponent {
             property string newSceneId: ""
 
             command: [
-                "pkill", "-f", ".*linux-wallpaperengine.*screen-root " + escapeRegex(monitor)
+                "pkill", "-f", ".*linux-wallpaperengine.*--screen-root " + escapeRegex(monitor)
             ]
 
 
@@ -232,9 +232,9 @@ PluginComponent {
             interval: 1500
 
             onTriggered: {
-                console.info("Set wp on", monitor, "to", screenshotPath)
+                console.info("LinuxWallpaperEngine: Set wp on", monitor, "to", screenshotPath)
                 if (!SessionData.perMonitorWallpaper) {
-                    SessionData.setPerMonitorWallpaper(enabled)
+                    SessionData.setPerMonitorWallpaper(true)
                 }
                 SessionData.setMonitorWallpaper(monitor, screenshotPath)
             }
@@ -259,7 +259,7 @@ PluginComponent {
         for (const monitor in monitorScenes) {
             // synchronous process call blocking
             Quickshell.execDetached([
-                "pkill", "-f", "linux-wallpaperengine.*--screen-root " + escapeRegex(monitor)
+                "pkill", "-f", ".*linux-wallpaperengine.*--screen-root " + escapeRegex(monitor)
             ])
         }
     }
