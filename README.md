@@ -6,6 +6,9 @@ A DankMaterialShell plugin for [linux-wallpaperengine](https://github.com/Almamu
 
 ## Installation
 
+### Pre-requisites
+1. Install [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine).
+
 ### From Plugin Registry (Recommended)
 1. Open DMS Settings
 2. Go to Plugins tab
